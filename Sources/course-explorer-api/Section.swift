@@ -27,7 +27,54 @@ struct Meeting {
     var instructors: [String] = []
 }
 
-class SectionParser: NSObject, XMLParserDelegate {
+class SectionParser {
+    func parseXML(data: Data) -> Section? {
+        let parser = Foundation.XMLParser(data: data)
+        let delegate = SectionParserDelegate()
+        parser.delegate = delegate
+        
+        if parser.parse() {
+            return delegate.currentSection
+        } else {
+            return nil
+        }
+    }
+    
+    func parseURL(url: URL, completion: @escaping (Section?) -> Void) {
+        // Create a URLSession task to fetch the XML data
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data, error == nil else {
+                print("Error fetching XML data:", error?.localizedDescription ?? "Unknown error")
+                completion(nil)
+                return
+            }
+            
+            // Create an XMLParser instance
+            let parser = XMLParser(data: data)
+        
+            // Create a delegate object
+            let delegate = SectionParserDelegate()
+        
+            // Set the delegate for the parser
+            parser.delegate = delegate
+        
+            // Start parsing
+            if parser.parse() {
+                print("Parsing successful")
+                completion(delegate.currentSection)
+            } else {
+                print("Parsing failed")
+                completion(nil)
+            }
+        }
+    
+    // Resume the task to initiate the data fetching
+    task.resume()
+    }
+}
+
+
+class SectionParserDelegate: NSObject, XMLParserDelegate {
     var currentElement: String = ""
     var currentValue: String = ""
     var currentSection: Section?
@@ -122,9 +169,7 @@ class SectionParser: NSObject, XMLParserDelegate {
         currentValue += string
     }
 
-    func parseXMLFromURL(year: String, semester: String, subject: String, course: String, section: String, completion: @escaping (Section?) -> Void) {
-        let urlString = "https://courses.illinois.edu/cisapp/explorer/schedule/" + year + "/" + semester + "/" + subject + "/" + course + "/" + section + ".xml"
-        let url = URL(string: urlString)!
+    func parseXMLFromURL(url: URL, completion: @escaping (Section?) -> Void) {
         print("Parsing \(url.absoluteString)")
         // Create a URLSession task to fetch the XML data
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
@@ -159,41 +204,6 @@ class SectionParser: NSObject, XMLParserDelegate {
         
         // Resume the task to initiate the data fetching
         task.resume()
-        RunLoop.current.run(until: Date(timeIntervalSinceNow: 3)) // Wait for 3 seconds
+        //RunLoop.current.run(until: Date(timeIntervalSinceNow: 3)) // Wait for 3 seconds
     }
 }
-
-
-
-/* let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
-
-let xmlParserDelegate = SectionParser()
-xmlParserDelegate.parseXMLFromURL(year: "2023", semester: "spring", subject: "ACES", course: "102", section: "63906") { section in
-    if section == nil {
-        print("Parsing failed")
-    } else {
-        print("Parsing completed successfully")
-        print("Course Code:", section!.subjectID! + " " + section!.courseID!)
-        print("Subject:", section!.subject!)
-        print("Course:", section!.course!)
-        print("Section Number:", section!.sectionNumber!)
-        print("Status Code:", section!.statusCode!)
-        print("Enrollment Status:", section!.enrollmentStatus!)
-        print("Part of Term:", section!.partOfTerm!)
-        print("Section Status Code:", section!.sectionStatusCode!)
-        print("Start Date:", section!.startDate!)
-        print("End Date:", section!.endDate!)
-        print(String(section!.meetings.count) + " Meetings:")
-        for meeting in section!.meetings {
-            print("  Meeting ID:", meeting.id!)
-            print("  Type:", meeting.type!)
-            print("  Type Code:", meeting.typeCode!)
-            print("  Start:", meeting.start!)
-            print("  End:", meeting.end!)
-            print("  Days of the Week:", meeting.daysOfTheWeek!)
-            print("  Room Number:", meeting.roomNumber!)
-            print("  Building Name:", meeting.buildingName!)
-            print("  " + String(meeting.instructors.count) + " Instructors:", meeting.instructors)
-        }
-    }
-} */

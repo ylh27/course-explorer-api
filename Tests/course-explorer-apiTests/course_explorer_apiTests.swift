@@ -8,37 +8,70 @@ import XCTest
 // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
 
 final class course_explorer_apiTests: XCTestCase {
-    func sectionTest() async throws {
-        let xmlParserDelegate = SectionParser()
-        xmlParserDelegate.parseXMLFromURL(year: "2023", semester: "spring", subject: "ACES", course: "102", section: "63906") { section in
-            XCTAssertNotNil(section, "Section is nil")
+    func testSectionParsing() {
+        // Arrange
+        let xmlString = """
+            <ns2:section id="63906" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml">
+                <parents>
+                    <calendarYear id="2023" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023.xml">2023</calendarYear>
+                    <term id="120231" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring.xml">Spring 2023</term>
+                    <subject id="ACES" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES.xml">Agricultural, Consumer and Environmental Sciences</subject>
+                    <course id="102" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102.xml">Intro Sustainable Food Systems</course>
+                </parents>
+                <sectionNumber>LR </sectionNumber>
+                <creditHours>3 hours</creditHours>
+                <statusCode>A</statusCode>
+                <sectionText>
+                    ACES 102 is a hybrid course that requires students to complete a portion of the course content online prior to attending the face-to-face class sessions.
+                </sectionText>
+                <partOfTerm>A</partOfTerm>
+                <sectionStatusCode>A</sectionStatusCode>
+                <enrollmentStatus>UNKNOWN</enrollmentStatus>
+                <startDate>2023-01-17Z</startDate>
+                <endDate>2023-03-10Z</endDate>
+                <meetings>
+                    <meeting id="0">
+                        <type code="LCD">Lecture-Discussion</type>
+                        <start>02:00 PM</start>
+                        <end>03:20 PM</end>
+                        <daysOfTheWeek>TR </daysOfTheWeek>
+                        <roomNumber>166</roomNumber>
+                        <buildingName>Bevier Hall</buildingName>
+                        <instructors>
+                            <instructor lastName="Ball" firstName="A">Ball, A</instructor>
+                        </instructors>
+                    </meeting>
+                </meetings>
+            </ns2:section>
+        """
+    
+        let data = xmlString.data(using: .utf8)!
+        let sectionParser = SectionParser()
+        
+        // Act
+        let section = sectionParser.parseXML(data: data)
+        
+        // Assert
+        XCTAssertNotNil(section, "Parsing should be successful")
+        XCTAssertEqual(section?.subjectID, "ACES", "Subject should be 'ACES'")
+        XCTAssertEqual(section?.courseID, "102", "Course should be '102'")
+    }
 
-            //print("Parsing completed successfully")
+    func testSectionParsingURL() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
+        let sectionParser = SectionParser()
+        
+        sectionParser.parseURL(url: url) { section in
+            // Assert
+            XCTAssertNotNil(section, "Parsing should be successful")
+            XCTAssertEqual(section?.subjectID, "ACES", "Subject should be 'ACES'")
+            XCTAssertEqual(section?.courseID, "102", "Course should be '102'")
             
-            //print("Course Code:", section!.subjectID! + " " + section!.courseID!)
-            XCTAssert(section!.subjectID! == "ACES", "Subject Mismatch")
-            
-            print("Subject:", section!.subject!)
-            print("Course:", section!.course!)
-            print("Section Number:", section!.sectionNumber!)
-            print("Status Code:", section!.statusCode!)
-            print("Enrollment Status:", section!.enrollmentStatus!)
-            print("Part of Term:", section!.partOfTerm!)
-            print("Section Status Code:", section!.sectionStatusCode!)
-            print("Start Date:", section!.startDate!)
-            print("End Date:", section!.endDate!)
-            print(String(section!.meetings.count) + " Meetings:")
-            for meeting in section!.meetings {
-                print("  Meeting ID:", meeting.id!)
-                print("  Type:", meeting.type!)
-                print("  Type Code:", meeting.typeCode!)
-                print("  Start:", meeting.start!)
-                print("  End:", meeting.end!)
-                print("  Days of the Week:", meeting.daysOfTheWeek!)
-                print("  Room Number:", meeting.roomNumber!)
-                print("  Building Name:", meeting.buildingName!)
-                print("  " + String(meeting.instructors.count) + " Instructors:", meeting.instructors)
-            }
+            expectation.fulfill()
         }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 5.0)
     }
 }
