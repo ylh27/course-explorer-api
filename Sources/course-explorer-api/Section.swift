@@ -1,6 +1,6 @@
 import Foundation
 
-struct Section {
+struct CourseSection {
     var subject: String?
     var subjectID: String?
     var course: String?
@@ -28,7 +28,7 @@ struct Meeting {
 }
 
 class SectionParser {
-    func parseXML(data: Data) -> Section? {
+    func parseXML(data: Data) -> CourseSection? {
         let parser = Foundation.XMLParser(data: data)
         let delegate = SectionParserDelegate()
         parser.delegate = delegate
@@ -40,7 +40,7 @@ class SectionParser {
         }
     }
     
-    func parseURL(url: URL, completion: @escaping (Section?) -> Void) {
+    func parseURL(url: URL, completion: @escaping (CourseSection?) -> Void) {
         // Create a URLSession task to fetch the XML data
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data, error == nil else {
@@ -77,7 +77,7 @@ class SectionParser {
 class SectionParserDelegate: NSObject, XMLParserDelegate {
     var currentElement: String = ""
     var currentValue: String = ""
-    var currentSection: Section?
+    var currentSection: CourseSection?
     var currentMeeting: Meeting?
     
     // Called when the parser starts parsing the document
@@ -94,7 +94,7 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
         currentElement = elementName
         if elementName == "ns2:section" {
-            currentSection = Section()
+            currentSection = CourseSection()
         } else if elementName == "subject" {
             if let subjectID = attributeDict["id"] {
                 currentSection!.subjectID = subjectID
@@ -169,7 +169,7 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
         currentValue += string
     }
 
-    func parseXMLFromURL(url: URL, completion: @escaping (Section?) -> Void) {
+    /*func parseXMLFromURL(url: URL, completion: @escaping (Section?) -> Void) {
         print("Parsing \(url.absoluteString)")
         // Create a URLSession task to fetch the XML data
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
@@ -205,5 +205,5 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
         // Resume the task to initiate the data fetching
         task.resume()
         //RunLoop.current.run(until: Date(timeIntervalSinceNow: 3)) // Wait for 3 seconds
-    }
+    }*/
 }

@@ -2,7 +2,7 @@
 // https://docs.swift.org/swift-book
 
 struct CISAPI {
-    var allSections: [Section] = []
+    var allSections: [CourseSection] = []
     
     func fetchAll() {
         
