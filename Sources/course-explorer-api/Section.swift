@@ -27,7 +27,32 @@ public struct Meeting {
     var instructors: [String] = []
 }
 
+// example section for previews and testing
+public func exampleSection() -> CourseSection {
+    return CourseSection(subject: "Electrical and Computer Engineering",
+                         subjectID: "ECE",
+                         course: "Computer Systems",
+                         courseID: "391",
+                         sectionNumber: "391",
+                         statusCode: "Avail",
+                         partOfTerm: "1",
+                         sectionStatusCode: "A",
+                         enrollmentStatus: "open",
+                         startDate: "2020-01-01Z",
+                         endDate: "2020-06-01Z",
+                         meetings: [Meeting(id: "0",
+                                            type: "Discussion",
+                                            typeCode: "DIS",
+                                            start: "6:30 AM",
+                                            end: "9:30 PM",
+                                            daysOfTheWeek: "TR",
+                                            roomNumber: "1013",
+                                            buildingName: "ECEB",
+                                            instructors: ["Doe, J"])])
+}
+
 class SectionParser {
+    // parse from xml
     func parseXML(data: Data) -> CourseSection? {
         let parser = Foundation.XMLParser(data: data)
         let delegate = SectionParserDelegate()
@@ -40,6 +65,7 @@ class SectionParser {
         }
     }
     
+    // parse from url
     func parseURL(url: URL, completion: @escaping (CourseSection?) -> Void) {
         // Create a URLSession task to fetch the XML data
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
@@ -72,7 +98,6 @@ class SectionParser {
     task.resume()
     }
 }
-
 
 class SectionParserDelegate: NSObject, XMLParserDelegate {
     var currentElement: String = ""
