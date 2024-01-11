@@ -8,8 +8,7 @@ import XCTest
 // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
 
 final class course_explorer_apiTests: XCTestCase {
-    func testSectionParsing() {
-        // Arrange
+    func testSection() {
         let xmlString = """
             <ns2:section id="63906" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml">
                 <parents>
@@ -57,7 +56,7 @@ final class course_explorer_apiTests: XCTestCase {
         XCTAssertEqual(section?.courseID, "102", "Course should be '102'")
     }
 
-    func testSectionParsingURL() {
+    func testSectionURL() {
         let expectation = XCTestExpectation(description: "Parsing XML from URL")
         let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
         let sectionParser = SectionParser()

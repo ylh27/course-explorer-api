@@ -1,30 +1,30 @@
 import Foundation
 
 public struct CourseSection {
-    var subject: String?
-    var subjectID: String?
-    var course: String?
-    var courseID: String?
-    var sectionNumber: String?
-    var statusCode: String?
-    var partOfTerm: String?
-    var sectionStatusCode: String?
-    var enrollmentStatus: String?
-    var startDate: String?
-    var endDate: String?
-    var meetings: [Meeting] = []
+    public var subject: String?
+    public var subjectID: String?
+    public var course: String?
+    public var courseID: String?
+    public var sectionNumber: String?
+    public var statusCode: String?
+    public var partOfTerm: String?
+    public var sectionStatusCode: String?
+    public var enrollmentStatus: String?
+    public var startDate: String?
+    public var endDate: String?
+    public var meetings: [Meeting] = []
 }
 
 public struct Meeting {
-    var id: String?
-    var type: String?
-    var typeCode: String?
-    var start: String?
-    var end: String?
-    var daysOfTheWeek: String?
-    var roomNumber: String?
-    var buildingName: String?
-    var instructors: [String] = []
+    public var id: String?
+    public var type: String?
+    public var typeCode: String?
+    public var start: String?
+    public var end: String?
+    public var daysOfTheWeek: String?
+    public var roomNumber: String?
+    public var buildingName: String?
+    public var instructors: [String] = []
 }
 
 // example section for previews and testing
