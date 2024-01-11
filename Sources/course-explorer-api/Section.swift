@@ -13,6 +13,7 @@ public struct CourseSection {
     public var startDate: String?
     public var endDate: String?
     public var meetings: [Meeting] = []
+    public var prereq: [String] = []
 }
 
 public struct Meeting {
@@ -66,9 +67,9 @@ class SectionParser {
     }
     
     // parse from url
-    func parseURL(url: URL, completion: @escaping (CourseSection?) -> Void) {
+    func parseURL(urlPrefix: String, SectionID: String, completion: @escaping (CourseSection?) -> Void) {
         // Create a URLSession task to fetch the XML data
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: URL(string: urlPrefix + "/" + SectionID + ".xml")!) { (data, response, error) in
             guard let data = data, error == nil else {
                 print("Error fetching XML data:", error?.localizedDescription ?? "Unknown error")
                 completion(nil)
@@ -86,10 +87,14 @@ class SectionParser {
         
             // Start parsing
             if parser.parse() {
-                print("Parsing successful")
-                completion(delegate.currentSection)
+                print("Section Parsing successful")
+                var section = delegate.currentSection
+                
+                // todo
+                
+                completion(section)
             } else {
-                print("Parsing failed")
+                print("Section Parsing failed")
                 completion(nil)
             }
         }
@@ -107,12 +112,12 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
     
     // Called when the parser starts parsing the document
     func parserDidStartDocument(_ parser: XMLParser) {
-        print("Parsing started")
+        print("Section Parsing started")
     }
     
     // Called when the parser finishes parsing the document
     func parserDidEndDocument(_ parser: XMLParser) {
-        print("Parsing ended")
+        print("Section Parsing ended")
     }
     
     // Called for each opening tag in the XML
@@ -168,7 +173,7 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
                 currentSection!.startDate = currentValue
             } else if currentElement == "endDate" {
                 currentSection!.endDate = currentValue
-            } 
+            }
         
             else if currentElement == "type" && currentMeeting != nil {
                 currentMeeting!.type = currentValue

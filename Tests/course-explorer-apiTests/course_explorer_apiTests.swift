@@ -8,60 +8,13 @@ import XCTest
 // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
 
 final class course_explorer_apiTests: XCTestCase {
-    func testSection() {
-        let xmlString = """
-            <ns2:section id="63906" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml">
-                <parents>
-                    <calendarYear id="2023" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023.xml">2023</calendarYear>
-                    <term id="120231" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring.xml">Spring 2023</term>
-                    <subject id="ACES" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES.xml">Agricultural, Consumer and Environmental Sciences</subject>
-                    <course id="102" href="https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102.xml">Intro Sustainable Food Systems</course>
-                </parents>
-                <sectionNumber>LR </sectionNumber>
-                <creditHours>3 hours</creditHours>
-                <statusCode>A</statusCode>
-                <sectionText>
-                    ACES 102 is a hybrid course that requires students to complete a portion of the course content online prior to attending the face-to-face class sessions.
-                </sectionText>
-                <partOfTerm>A</partOfTerm>
-                <sectionStatusCode>A</sectionStatusCode>
-                <enrollmentStatus>UNKNOWN</enrollmentStatus>
-                <startDate>2023-01-17Z</startDate>
-                <endDate>2023-03-10Z</endDate>
-                <meetings>
-                    <meeting id="0">
-                        <type code="LCD">Lecture-Discussion</type>
-                        <start>02:00 PM</start>
-                        <end>03:20 PM</end>
-                        <daysOfTheWeek>TR </daysOfTheWeek>
-                        <roomNumber>166</roomNumber>
-                        <buildingName>Bevier Hall</buildingName>
-                        <instructors>
-                            <instructor lastName="Ball" firstName="A">Ball, A</instructor>
-                        </instructors>
-                    </meeting>
-                </meetings>
-            </ns2:section>
-        """
-    
-        let data = xmlString.data(using: .utf8)!
-        let sectionParser = SectionParser()
-        
-        // Act
-        let section = sectionParser.parseXML(data: data)
-        
-        // Assert
-        XCTAssertNotNil(section, "Parsing should be successful")
-        XCTAssertEqual(section?.subjectID, "ACES", "Subject should be 'ACES'")
-        XCTAssertEqual(section?.courseID, "102", "Course should be '102'")
-    }
 
     func testSectionURL() {
         let expectation = XCTestExpectation(description: "Parsing XML from URL")
-        let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
+        //let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
         let sectionParser = SectionParser()
         
-        sectionParser.parseURL(url: url) { section in
+        sectionParser.parseURL(urlPrefix: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102", SectionID: "63906") { section in
             // Assert
             XCTAssertNotNil(section, "Parsing should be successful")
             XCTAssertEqual(section?.subjectID, "ACES", "Subject should be 'ACES'")
@@ -73,4 +26,58 @@ final class course_explorer_apiTests: XCTestCase {
         // Wait for the expectation to be fulfilled within a reasonable timeout
         wait(for: [expectation], timeout: 5.0)
     }
+    
+    func testCourseURL() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS/100.xml")!
+        let courseParser = IdParser(parentTag: "sections", childTag: "section")
+        
+        courseParser.parseURL(url: url) { list in
+            // Assert
+            XCTAssertNotNil(list, "Parsing should be successful")
+            XCTAssertEqual(list?.count, 11, "List should have count of 14")
+            XCTAssertEqual(list?[5], "50105", "2nd list in should have id '201'")
+            print(list!)
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 5.0)
+    }
+
+    func testSubjectURL() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS.xml")!
+        let subjectParser = IdParser(parentTag: "courses", childTag: "course")
+        
+        subjectParser.parseURL(url: url) { list in
+            // Assert
+            XCTAssertNotNil(list, "Parsing should be successful")
+            XCTAssertEqual(list?.count, 14, "List should have count of 14")
+            XCTAssertEqual(list?[2], "201", "2nd list in should have id '201'")
+            print(list!)
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 5.0)
+    }
+    
+    func testCourseTraversal() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS/100"
+        
+        traverseCourse(urlPrefix: urlPrefix) { list in
+            // Assert
+            XCTAssertNotNil(list, "Parsing should be successful")
+            XCTAssertEqual(list?.count, 11, "List should have count of 11")
+            print(list![0])
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 15.0)
+
+    }
+
 }
