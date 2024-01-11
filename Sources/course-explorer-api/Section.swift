@@ -1,6 +1,6 @@
 import Foundation
 
-struct CourseSection {
+public struct CourseSection {
     var subject: String?
     var subjectID: String?
     var course: String?
@@ -15,7 +15,7 @@ struct CourseSection {
     var meetings: [Meeting] = []
 }
 
-struct Meeting {
+public struct Meeting {
     var id: String?
     var type: String?
     var typeCode: String?

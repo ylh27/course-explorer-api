@@ -1,7 +1,7 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-struct CISAPI {
+public class CISAPI {
     var allSections: [CourseSection] = []
     
     func fetchAll() {
