@@ -122,7 +122,9 @@ class SectionParser: NSObject, XMLParserDelegate {
         currentValue += string
     }
 
-    func parseXMLFromURL(url: URL, completion: @escaping (Section?) -> Void) {
+    func parseXMLFromURL(year: String, semester: String, subject: String, course: String, section: String, completion: @escaping (Section?) -> Void) {
+        let urlString = "https://courses.illinois.edu/cisapp/explorer/schedule/" + year + "/" + semester + "/" + subject + "/" + course + "/" + section + ".xml"
+        let url = URL(string: urlString)!
         print("Parsing \(url.absoluteString)")
         // Create a URLSession task to fetch the XML data
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
@@ -163,10 +165,10 @@ class SectionParser: NSObject, XMLParserDelegate {
 
 
 
-let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
+/* let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2023/spring/ACES/102/63906.xml")!
 
 let xmlParserDelegate = SectionParser()
-xmlParserDelegate.parseXMLFromURL(url: url) { section in
+xmlParserDelegate.parseXMLFromURL(year: "2023", semester: "spring", subject: "ACES", course: "102", section: "63906") { section in
     if section == nil {
         print("Parsing failed")
     } else {
@@ -194,4 +196,4 @@ xmlParserDelegate.parseXMLFromURL(url: url) { section in
             print("  " + String(meeting.instructors.count) + " Instructors:", meeting.instructors)
         }
     }
-}
+} */
