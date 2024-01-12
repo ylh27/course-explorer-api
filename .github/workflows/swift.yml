@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/setup-swift@latest
+    - uses: swift-actions/setup-swift@latest
       with:
         swift-version: "5.9"
     - uses: actions/checkout@v3
