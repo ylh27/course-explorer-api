@@ -3,7 +3,7 @@ import Foundation
 // traverse the course level
 // function will retreive a list of section id in the course
 // each section is added to the list
-func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
+public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
     let url = URL(string: urlPrefix + ".xml")!
     let courseParser = IdParser(parentTag: "sections", childTag: "section")
     
