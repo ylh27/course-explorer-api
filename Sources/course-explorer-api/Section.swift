@@ -1,31 +1,31 @@
 import Foundation
 
-public struct CourseSection: Identifiable {
+public struct CourseSection: Identifiable, Codable {
     public var id = UUID()
-    public var subject: String?
-    public var subjectID: String?
-    public var course: String?
-    public var courseID: String?
-    public var sectionNumber: String?
-    public var statusCode: String?
-    public var partOfTerm: String?
-    public var sectionStatusCode: String?
-    public var enrollmentStatus: String?
-    public var startDate: String?
-    public var endDate: String?
+    public var subject: String = ""
+    public var subjectID: String = ""
+    public var course: String = ""
+    public var courseID: String = ""
+    public var sectionNumber: String = ""
+    public var statusCode: String = ""
+    public var partOfTerm: String = ""
+    public var sectionStatusCode: String = ""
+    public var enrollmentStatus: String = ""
+    public var startDate: String = ""
+    public var endDate: String = ""
     public var meetings: [Meeting] = []
     public var prereq: [String] = []
 }
 
-public struct Meeting {
-    public var id: String?
-    public var type: String?
-    public var typeCode: String?
-    public var start: String?
-    public var end: String?
-    public var daysOfTheWeek: String?
-    public var roomNumber: String?
-    public var buildingName: String?
+public struct Meeting: Identifiable, Codable {
+    public var id: String = ""
+    public var type: String = ""
+    public var typeCode: String = ""
+    public var start: String = ""
+    public var end: String = ""
+    public var daysOfTheWeek: String = ""
+    public var roomNumber: String = ""
+    public var buildingName: String = ""
     public var instructors: [String] = []
 }
 

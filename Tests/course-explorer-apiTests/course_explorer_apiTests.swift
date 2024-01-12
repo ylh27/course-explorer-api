@@ -82,7 +82,7 @@ final class course_explorer_apiTests: XCTestCase {
 
     func testSubjectTraversal() {
         let expectation = XCTestExpectation(description: "Parsing XML from URL")
-        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS"
+        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/ECE"
         
         traverseSubject(urlPrefix: urlPrefix) { list in
             // Assert
@@ -94,7 +94,25 @@ final class course_explorer_apiTests: XCTestCase {
         }
         
         // Wait for the expectation to be fulfilled within a reasonable timeout
-        wait(for: [expectation], timeout: 30.0)
+        wait(for: [expectation], timeout: 100.0)
+
+    }
+    
+    func testSemesterTraversal() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring"
+        
+        traverseSemester(urlPrefix: urlPrefix) { list in
+            // Assert
+            XCTAssertNotNil(list, "Parsing should be successful")
+            //XCTAssertEqual(list?.count, 11, "List should have count of 11")
+            print("Total of " + String(list!.count) + " subjects.")
+            print(list![0])
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 1000.0)
 
     }
     

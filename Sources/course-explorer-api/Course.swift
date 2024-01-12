@@ -20,9 +20,9 @@ public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSect
             //let section_url = URL(string: urlPrefix + "/" + section + ".xml")!
             let sectionParser = SectionParser()
             
-            sectionParser.parseURL(urlPrefix: urlPrefix, SectionID: section) { section in
-                SectionList.append(section!)
-                print(section!.sectionNumber! + " parsed")
+            sectionParser.parseURL(urlPrefix: urlPrefix, SectionID: section) { Section in
+                SectionList.append(Section!)
+                print(Section!.subjectID + " " + Section!.courseID + " parsed")
                 print(String(SectionList.count) + "/" + String(list!.count) + " Sections")
                 if SectionList.count == list!.count {
                     completion(SectionList)
