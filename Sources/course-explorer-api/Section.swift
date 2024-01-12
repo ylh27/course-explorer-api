@@ -1,6 +1,7 @@
 import Foundation
 
-public struct CourseSection {
+public struct CourseSection: Identifiable {
+    public var id = UUID()
     public var subject: String?
     public var subjectID: String?
     public var course: String?
@@ -34,8 +35,8 @@ public func exampleSection() -> CourseSection {
                          subjectID: "ECE",
                          course: "Computer Systems",
                          courseID: "391",
-                         sectionNumber: "391",
-                         statusCode: "Avail",
+                         sectionNumber: "AD1",
+                         statusCode: "UNKNOWN",
                          partOfTerm: "1",
                          sectionStatusCode: "A",
                          enrollmentStatus: "open",
@@ -90,7 +91,10 @@ class SectionParser {
                 print("Section Parsing successful")
                 var section = delegate.currentSection
                 
-                // todo
+                // todo: parse prereq
+                
+                
+                
                 
                 completion(section)
             } else {
