@@ -1,38 +1,18 @@
 import Foundation
 
-// traverse the course level
-// function will retreive a list of section id in the course
-// each section is added to the list
-public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
-    let url = URL(string: urlPrefix + ".xml")!
-    let courseParser = IdParser(parentTag: "sections", childTag: "section")
-    
-    var SectionList: [CourseSection] = []
-    
-    courseParser.parseURL(url: url) { list in
-        print("traversing list")
-        if list == nil {
-            print("parsing '" + urlPrefix + ".xml' unsucessful")
-            completion(nil)
-        }
-        for section in list! {
-            print("parsing " + urlPrefix + "/" + section + ".xml")
-            //let section_url = URL(string: urlPrefix + "/" + section + ".xml")!
-            let sectionParser = SectionParser()
-            
-            sectionParser.parseURL(urlPrefix: urlPrefix, SectionID: section) { Section in
-                SectionList.append(Section!)
-                print(Section!.subjectID + " " + Section!.courseID + " parsed")
-                print(String(SectionList.count) + "/" + String(list!.count) + " Sections")
-                if SectionList.count == list!.count {
-                    completion(SectionList)
-                }
-            }
-        }
-    }
+public struct Course: Identifiable, Codable {
+    public var id: String = ""
+    public var subject: String = ""
+    public var subjectID: String = ""
+    public var course: String = ""
+    public var courseID: String = ""
+    public var description: String = ""
+    public var creditHours: String = ""
+    public var prereq: [String] = []    // todo
+    public var sections: [CourseSection] = []
 }
 
-/*class CourseParser {
+class CourseParser {
     // parse from xml
     func parseXML(data: Data) -> [String]? {
         let parser = XMLParser(data: data)
@@ -47,9 +27,9 @@ public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSect
     }
     
     // parse from url
-    func parseURL(url: URL, completion: @escaping ([String]?) -> Void) {
+    func parseURL(urlPrefix: String, course: String, completion: @escaping (Course?) -> Void) {
         // Create a URLSession task to fetch the XML data
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+        let task = URLSession.shared.dataTask(with: URL(string: urlPrefix+"/"+course+".xml")!) { (data, response, error) in
             guard let data = data, error == nil else {
                 print("Error fetching XML data:", error?.localizedDescription ?? "Unknown error")
                 completion(nil)
@@ -68,7 +48,17 @@ public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSect
             // Start parsing
             if parser.parse() {
                 print("Parsing successful")
-                completion(delegate.list)
+                var returnCourse = delegate.currentCourse
+                returnCourse.courseID = course
+                for sectionID in delegate.list {
+                    let sectionParser = SectionParser()
+                    sectionParser.parseURL(urlPrefix: urlPrefix+"/"+course, SectionID: sectionID) { section in
+                        returnCourse.sections.append(section!)
+                        if delegate.list.count == returnCourse.sections.count {
+                            completion(returnCourse)
+                        }
+                    }
+                }
             } else {
                 print("Parsing failed")
                 completion(nil)
@@ -83,7 +73,9 @@ public func traverseCourse(urlPrefix: String, completion: @escaping ([CourseSect
 class CourseParserDelegate: NSObject, XMLParserDelegate {
     var currentElement: String = ""
     var currentValue: String = ""
-    var list: [String]?
+    var list: [String] = []
+    var currentCourse: Course = Course()
+    var courseSectionInformation: String = ""
     
     // Called when the parser starts parsing the document
     func parserDidStartDocument(_ parser: XMLParser) {
@@ -102,13 +94,36 @@ class CourseParserDelegate: NSObject, XMLParserDelegate {
             list = []
         } else if elementName == "section" {
             if let id = attributeDict["id"] {
-                list!.append(id)
+                list.append(id)
+            }
+        }
+        
+        else if elementName == "ns2:course" {
+            if let id = attributeDict["id"] {
+                currentCourse.id = id
+            }
+        } else if elementName == "subject" {
+            if let id = attributeDict["id"] {
+                currentCourse.subjectID = id
             }
         }
     }
     
     // Called for each closing tag in the XML
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        if currentElement == elementName {
+            if elementName == "subject" {
+                currentCourse.subject = currentValue
+            } else if elementName == "label" {
+                currentCourse.course = currentValue
+            } else if elementName == "description" {
+                currentCourse.description = currentValue
+            } else if elementName == "creditHours" {
+                currentCourse.creditHours = currentValue
+            } else if elementName == "courseSectionInformation" {
+                courseSectionInformation = currentValue
+            }
+        }
         currentValue = ""
     }
     
@@ -116,5 +131,5 @@ class CourseParserDelegate: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         currentValue += string
     }
-}*/
+}
 

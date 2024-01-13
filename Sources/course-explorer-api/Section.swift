@@ -1,7 +1,7 @@
 import Foundation
 
 public struct CourseSection: Identifiable, Codable {
-    public var id = UUID()
+    public var id: String = ""
     public var subject: String = ""
     public var subjectID: String = ""
     public var course: String = ""
@@ -14,7 +14,6 @@ public struct CourseSection: Identifiable, Codable {
     public var startDate: String = ""
     public var endDate: String = ""
     public var meetings: [Meeting] = []
-    public var prereq: [String] = []
 }
 
 public struct Meeting: Identifiable, Codable {
@@ -89,14 +88,7 @@ class SectionParser {
             // Start parsing
             if parser.parse() {
                 print("Section Parsing successful")
-                var section = delegate.currentSection
-                
-                // todo: parse prereq
-                
-                
-                
-                
-                completion(section)
+                completion(delegate.currentSection)
             } else {
                 print("Section Parsing failed")
                 completion(nil)
@@ -129,6 +121,9 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
         currentElement = elementName
         if elementName == "ns2:section" {
             currentSection = CourseSection()
+            if let id = attributeDict["id"] {
+                currentSection!.id = id
+            }
         } else if elementName == "subject" {
             if let subjectID = attributeDict["id"] {
                 currentSection!.subjectID = subjectID
@@ -202,42 +197,4 @@ class SectionParserDelegate: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         currentValue += string
     }
-
-    /*func parseXMLFromURL(url: URL, completion: @escaping (Section?) -> Void) {
-        print("Parsing \(url.absoluteString)")
-        // Create a URLSession task to fetch the XML data
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            //print("Data:", data!)
-            //print("Response:", response!)
-            //print("Error:", error!)
-            
-            guard let data = data, error == nil else {
-                print("Error fetching XML data:", error?.localizedDescription ?? "Unknown error")
-                completion(nil)
-                return
-            }
-            
-            // Create an XMLParser instance
-            let parser = XMLParser(data: data)
-            
-            // Create a delegate object
-            //let delegate = SectionParser()
-            
-            // Set the delegate for the parser
-            parser.delegate = self
-            
-            // Start parsing
-            if parser.parse() {
-                print("Parsing successful")
-                completion(self.currentSection)
-            } else {
-                print("Parsing failed")
-                completion(nil)
-            }
-        }
-        
-        // Resume the task to initiate the data fetching
-        task.resume()
-        //RunLoop.current.run(until: Date(timeIntervalSinceNow: 3)) // Wait for 3 seconds
-    }*/
 }

@@ -29,15 +29,12 @@ final class course_explorer_apiTests: XCTestCase {
     
     func testCourseURL() {
         let expectation = XCTestExpectation(description: "Parsing XML from URL")
-        let url = URL(string: "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS/100.xml")!
-        let courseParser = IdParser(parentTag: "sections", childTag: "section")
         
-        courseParser.parseURL(url: url) { list in
+        CourseParser().parseURL(urlPrefix: "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS", course: "100") { course in
             // Assert
-            XCTAssertNotNil(list, "Parsing should be successful")
-            XCTAssertEqual(list?.count, 11, "List should have count of 14")
-            XCTAssertEqual(list?[5], "50105", "2nd list in should have id '201'")
-            print(list!)
+            XCTAssertNotNil(course, "Parsing should be successful")
+            XCTAssertEqual(course?.sections.count, 11, "List should have count of 11")
+            print(course!)
             expectation.fulfill()
         }
         
@@ -61,23 +58,6 @@ final class course_explorer_apiTests: XCTestCase {
         
         // Wait for the expectation to be fulfilled within a reasonable timeout
         wait(for: [expectation], timeout: 5.0)
-    }
-    
-    func testCourseTraversal() {
-        let expectation = XCTestExpectation(description: "Parsing XML from URL")
-        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule/2024/spring/AAS/100"
-        
-        traverseCourse(urlPrefix: urlPrefix) { list in
-            // Assert
-            XCTAssertNotNil(list, "Parsing should be successful")
-            XCTAssertEqual(list?.count, 11, "List should have count of 11")
-            print(list![0])
-            expectation.fulfill()
-        }
-        
-        // Wait for the expectation to be fulfilled within a reasonable timeout
-        wait(for: [expectation], timeout: 15.0)
-
     }
 
     func testSubjectTraversal() {

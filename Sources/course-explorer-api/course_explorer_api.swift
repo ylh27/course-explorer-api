@@ -4,7 +4,7 @@ public func fetchAll(completion: @escaping ([CourseSection]?) -> Void) {
     
 }
 
-func traverseSemester(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
+public func traverseSemester(urlPrefix: String, completion: @escaping ([Course]?) -> Void) {
     let url = URL(string: urlPrefix + ".xml")!
     let semesterParser = IdParser(parentTag: "subjects", childTag: "subject")
     
@@ -15,7 +15,7 @@ func traverseSemester(urlPrefix: String, completion: @escaping ([CourseSection]?
         }
         print("semester list parsed")
         var count = 0
-        var returnList: [CourseSection] = []
+        var returnList: [Course] = []
         for subject in list! {
             print("parsing " + urlPrefix+"/"+subject+".xml")
             traverseSubject(urlPrefix: urlPrefix+"/"+subject) { SectionList in

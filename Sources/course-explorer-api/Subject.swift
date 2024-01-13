@@ -4,7 +4,7 @@ import Foundation
 // traverse the subject level
 // function will retreive use SubjectParser to retreive a list of course id in the subject
 // then course level traversal is called for every course in the list
-public func traverseSubject(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
+public func traverseSubject(urlPrefix: String, completion: @escaping ([Course]?) -> Void) {
     let url = URL(string: urlPrefix + ".xml")!
     let subjectParser = IdParser(parentTag: "courses", childTag: "course")
     
@@ -13,14 +13,12 @@ public func traverseSubject(urlPrefix: String, completion: @escaping ([CourseSec
             print("parsing '" + urlPrefix + ".xml' unsucessful")
             completion(nil)
         }
-        var count = 0
-        var returnList: [CourseSection] = []
-        for course in list! {
-            traverseCourse(urlPrefix: urlPrefix+"/"+course) { SectionList in
-                returnList += SectionList!
-                count += 1
-                print(String(count) + "/" + String(list!.count) + " Courses")
-                if count == list!.count {
+        
+        var returnList: [Course] = []
+        for courseID in list! {
+            CourseParser().parseURL(urlPrefix: urlPrefix, course: courseID) { course in
+                returnList.append(course!)
+                if returnList.count == list!.count {
                     completion(returnList)
                 }
             }
