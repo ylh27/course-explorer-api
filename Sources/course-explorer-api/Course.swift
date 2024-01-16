@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Course: Identifiable, Codable {
+public struct Course: Identifiable, Codable, Equatable {
     public var id: String = ""
     public var subject: String = ""
     public var subjectID: String = ""

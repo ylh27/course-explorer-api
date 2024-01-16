@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CourseSection: Identifiable, Codable {
+public struct CourseSection: Identifiable, Codable, Equatable {
     public var id: String = ""
     public var subject: String = ""
     public var subjectID: String = ""
@@ -16,7 +16,7 @@ public struct CourseSection: Identifiable, Codable {
     public var meetings: [Meeting] = []
 }
 
-public struct Meeting: Identifiable, Codable {
+public struct Meeting: Identifiable, Codable, Equatable {
     public var id: String = ""
     public var type: String = ""
     public var typeCode: String = ""

@@ -74,7 +74,7 @@ final class course_explorer_apiTests: XCTestCase {
         }
         
         // Wait for the expectation to be fulfilled within a reasonable timeout
-        wait(for: [expectation], timeout: 100.0)
+        wait(for: [expectation], timeout: 30.0)
 
     }
     
@@ -92,8 +92,25 @@ final class course_explorer_apiTests: XCTestCase {
         }
         
         // Wait for the expectation to be fulfilled within a reasonable timeout
-        wait(for: [expectation], timeout: 1000.0)
+        wait(for: [expectation], timeout: 30.0)
 
+    }
+    
+    func testGetYears() {
+        let expectation = XCTestExpectation(description: "Parsing XML from URL")
+        let urlPrefix = "https://courses.illinois.edu/cisapp/explorer/schedule"
+        
+        getYears(urlPrefix: urlPrefix) { list in
+            // Assert
+            XCTAssertNotNil(list, "Parsing should be successful")
+            //XCTAssertEqual(list?.count, 11, "List should have count of 11")
+            print("Total of " + String(list!.count) + " years.")
+            print(list!)
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within a reasonable timeout
+        wait(for: [expectation], timeout: 30.0)
     }
     
 }

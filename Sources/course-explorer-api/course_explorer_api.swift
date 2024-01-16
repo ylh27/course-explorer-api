@@ -1,6 +1,6 @@
 import Foundation
 
-public func fetchAll(completion: @escaping ([CourseSection]?) -> Void) {
+public func fetchAll(urlPrefix: String, completion: @escaping ([CourseSection]?) -> Void) {
     
 }
 
@@ -27,5 +27,18 @@ public func traverseSemester(urlPrefix: String, completion: @escaping ([Course]?
                 }
             }
         }
+    }
+}
+
+public func getYears(urlPrefix: String, completion: @escaping ([String]?) -> Void) {
+    let url = URL(string: urlPrefix + ".xml")!
+    let yearParser = IdParser(parentTag: "calendarYears", childTag: "calendarYear")
+    
+    yearParser.parseURL(url: url) { list in
+        if list == nil {
+            print("parsing '" + urlPrefix + ".xml' unsucessful")
+            completion(nil)
+        }
+        completion(list)
     }
 }
